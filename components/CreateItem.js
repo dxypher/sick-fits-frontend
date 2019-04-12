@@ -28,17 +28,36 @@ const CREATE_ITEM_MUTATION = gql`
 
 class CreateItem extends Component {
   state = {
-    title: 'Cool Shoes',
-    description: 'I love those shoes',
-    image: 'dog.jpg',
-    largeImage: 'large-dog.jpg',
-    price: 1000,
+    title: '',
+    description: '',
+    image: '',
+    largeImage: '',
+    price: 0,
   };
+
   handleChange = e => {
     const { name, type, value } = e.target;
     const val = type === 'number' ? parseFloat(value) : value;
     this.setState({ [name]: val });
   };
+  
+  uploadFile = async (e) => {
+    const files = e.target.files;
+    const data = new FormData();
+    data.append('file', files[0]);
+    data.append('upload_preset', 'sickfits');
+
+    const res = await fetch("https://api.cloudinary.com/v1_1/ddkyjcdnj/image/upload", {
+      method: "POST",
+      body: data
+    });
+    const file = await res.json();
+    this.setState({
+      image: file.secure_url,
+      largeImage: file.eager[0].secure_url
+    })
+  };
+
   render() {
     return (
       <Mutation mutation={CREATE_ITEM_MUTATION} variables={this.state}>
@@ -52,13 +71,27 @@ class CreateItem extends Component {
               // change them to the single item page
               console.log(res);
               Router.push({
-                pathname: '/item',
+                pathname: '/items',
                 query: { id: res.data.createItem.id },
               });
             }}
           >
             <Error error={error} />
             <fieldset disabled={loading} aria-busy={loading}>
+              <label htmlFor="file">
+                Image
+                <input
+                  type="file"
+                  id="file"
+                  name="file"
+                  placeholder="Upload an Image"
+                  required
+                  value={this.state.file}
+                  onChange={this.uploadFile}
+                />
+                {this.state.image && <img src={this.state.image} alt='upload preview' />}
+              </label>
+
               <label htmlFor="title">
                 Title
                 <input
