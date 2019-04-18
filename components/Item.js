@@ -25,7 +25,7 @@ export default class Item extends Component {
         <PriceTag>{formatMoney(item.price)}</PriceTag>
         <p>{item.description}</p>
         <div className="buttonList">
-          <Link href={{ pathname: "upate", query: { id: item.id } }}><a>Edit ✏️</a></Link>
+          <Link href={{ pathname: "update", query: { id: item.id } }}><a>Edit ✏️</a></Link>
           <button>Add To Cart</button>
           <button>Delete</button>
         </div>
